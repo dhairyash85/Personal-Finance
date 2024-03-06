@@ -17,16 +17,18 @@ const Signup = () => {
   }
   const handleSubmit=async (e)=>{
     e.preventDefault()
-    const response=await axios.post(" http://127.0.0.1:5000/api/signup", {
-      email:formData.email,
-      password:formData.password,
-      username:formData.username,
-      fname:formData.fname,
-      lname:formData.lname,
-      age:formData.age,
-    }, {
+    const response=await fetch(" http://127.0.0.1:5000/api/signup", {
+        method:"POST",
         headers: {
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'Application/json'
+        },
+        body:{
+          email:formData.email,
+          password:formData.password,
+          username:formData.username,
+          fname:formData.fname,
+          lname:formData.lname,
+          age:formData.age,
         }
       })
     console.alert(response)
