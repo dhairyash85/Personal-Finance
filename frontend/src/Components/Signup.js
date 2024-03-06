@@ -139,12 +139,8 @@ const Signup = () => {
             </div>
             <p className="flex flex-col items-center justify-center mt-10 text-center text-md text-gray-500">
               <span>Registered?</span>
-              <a
-                href="#"
-                className="text-indigo-500 hover:text-indigo-500no-underline hover:underline cursor-pointer transition ease-in duration-300"
-              >
-                Sign in
-              </a>
+              
+              <Link to='/login'>Sign In</Link>
             </p>
           </form>
         </div>
