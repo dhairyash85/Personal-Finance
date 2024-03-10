@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import {Link, useNavigate} from 'react-router-dom'
-import axios from 'axios'
+import {Link, json, useNavigate} from 'react-router-dom'
 const Signup = () => {
     let navigate=useNavigate()
     const [formData, setFormData]=useState({
@@ -15,24 +14,42 @@ const Signup = () => {
       setFormData({...formData,[event.target.name]: event.target.value})
       console.log(formData)
   }
-  const handleSubmit=async (e)=>{
-    e.preventDefault()
-    const response=await fetch(" http://127.0.0.1:5000/api/signup", {
-        method:"POST",
-        headers: {
-          'Content-Type': 'Application/json'
-        },
-        body:{
-          email:formData.email,
-          password:formData.password,
-          username:formData.username,
-          fname:formData.fname,
-          lname:formData.lname,
-          age:formData.age,
-        }
-      })
-    console.alert(response)
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    const form = {
+      email: formData.email,
+      password: formData.password,
+      username: formData.username,
+      fname: formData.fname,
+      lname: formData.lname,
+      age: formData.age
+    };
+  
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json' 
+      },
+      body: JSON.stringify(form)
+    };
+  
+    try {
+      const response = await fetch('http://127.0.0.1:5000/api/signup', requestOptions);
+      console.log(response)
+      const responseData = await response.json();
+      console.log(responseData); // assuming the response is JSON
+      if (!responseData.success) {
+        throw new Error('Network response was not ok');
+      }
+      else{
+        console.log("User created")
+        navigate('/login')
+      }
+    } catch (error) {
+      console.error('There was a problem with the fetch operation:', error);
+    }
+  };
     return (    
       <div
         className="min-h-screen flex justify-center py-12  sm:px-6 lg:px-8 items-center  bg-gray-500"
@@ -141,12 +158,8 @@ const Signup = () => {
             </div>
             <p className="flex flex-col items-center justify-center mt-10 text-center text-md text-gray-500">
               <span>Registered?</span>
-              <a
-                href="#"
-                className="text-indigo-500 hover:text-indigo-500no-underline hover:underline cursor-pointer transition ease-in duration-300"
-              >
-                Sign in
-              </a>
+              
+              <Link to='/login'>Sign In</Link>
             </p>
           </form>
         </div>

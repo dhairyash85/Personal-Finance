@@ -1,38 +1,57 @@
-from flask import Flask, send_from_directory, send_file, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import mysql.connector
+from flask_cors import CORS, cross_origin
 from datetime import date
-app = Flask(__name__)
+
+app = Flask(__name__,
+            static_url_path='/',
+            static_folder='build/')
+# CORS(app, origins=['http://localhost:3000'])
+CORS(app, support_credentials=True)
+@app.route('/')
+# @cross_origin(supports_credentials=True)
+def home():
+    return send_from_directory('build', 'index.html')
 
 @app.route('/api/login', methods=['POST'])
+# @cross_origin(supports_credentials=True)
 def login():
     data = request.get_json()
-    email=data["email"]
-    password=data['password']
+    email = data["email"]
+    password = data['password']
+
     mydb = mysql.connector.connect(
         host="localhost",
         user="root",
         password="dheerizz",
         database='Finance Tracker'
     )
+
     user = mydb.cursor()
     user.execute(f"SELECT * FROM users where email='{email}'")
-    user=user.fetchall()
-    if(not user):
-        return jsonify({"success": False, "reason":"user does not exist"})
-    elif(user[0][6] != password):
-        return jsonify({"success": False, "reason":"Incorrect Password"})
+    user = user.fetchone()
+    if not user:
+        return jsonify({"success": False, "reason": "User does not exist"})
+    elif user[6] != password:
+        return jsonify({"success": False, "reason": "Incorrect Password"})
     else:
-        return jsonify({"success":True})
+        # return jsonify({"success": True, "user":user})
+        response = jsonify({"success": True, "user":user})
+        print(user)
+        response.headers.add('Access-Control-Allow-Origin', '*')  # Allow requests from any origin
+        return response
 
 @app.route('/api/signup', methods=['POST'])
+# @cross_origin(supports_credentials=True)
 def signup():
     data = request.get_json()
-    email=data["email"]
-    password=data['password']
-    fname=data['fname']
-    lname=data['lname']
-    age=data['age']
-    username=data['username']
+    email = data["email"]
+    password = data['password']
+    fname = data['fname']
+    lname = data['lname']
+    age = data['age']
+    username = data['username']
+
     try:
         mydb = mysql.connector.connect(
             host="localhost",
@@ -40,24 +59,25 @@ def signup():
             password="dheerizz",
             database='Finance Tracker'
         )
+
         user = mydb.cursor()
-        user.execute(f"INSERT INTO users VALUE('{email}', '{fname}', '{lname}', '{username}', {age}, '{password}')")
+        user.execute(f"INSERT INTO users(email, fname, lname, username, age, password) VALUE('{email}', '{fname}', '{lname}', '{username}', {age}, '{password}')")
         mydb.commit()
+
         return jsonify({"success": True})
-    except KeyError:
-        print(KeyError)
-    except RuntimeError:
-        print(RuntimeError)
-        return jsonify({"success":False,"error":"An error occurred while trying to add the new user."})
-    
+    except Exception as e:
+        print(e)
+        return jsonify({"success": False, "error": "An error occurred while trying to add the new user."})
+
 @app.route('/api/addexpense', methods=['POST'])
+# @cross_origin(supports_credentials=True)
 def addExpense():
     data = request.get_json()
-    amount=data['amount']
-    fname=data['fname']
-    username=data['username']
+    amount = data['amount']
+    type = data['type']
+    username = data['username']
     current_date = date.today()
-    print(current_date)
+
     try:
         mydb = mysql.connector.connect(
             host="localhost",
@@ -65,20 +85,24 @@ def addExpense():
             password="dheerizz",
             database='Finance Tracker'
         )
+
         user = mydb.cursor()
-        user.execute(f"INSERT INTO expenses VALUE('{username}', '{fname}', '{current_date}', {amount})")
+        user.execute(f"INSERT INTO expenses VALUE('{username}', '{type}', '{current_date}', {amount})")
         mydb.commit()
-        return jsonify({"success": True})
-    except KeyError:
-        print(KeyError)
-    except RuntimeError:
-        print(RuntimeError)
-        return jsonify({"success":False,"error":"An error occurred while trying to add the new user."})
+        response = jsonify({"success": True})
+        response.headers.add('Access-Control-Allow-Origin', '*')  # Allow requests from any origin
+        return response    
+    except Exception as e:
+        print(e)
+        return jsonify({"success": False, "error": "An error occurred while trying to add the new expense."})
 
 @app.route('/api/returnexpense', methods=['POST'])
+# @cross_origin(supports_credentials=True)
 def returnExpense():
     data = request.get_json()
-    username=data['username']
+    # print("\n\n\n\n\n\n",data,"\n\n\n\n\n")
+    username = data['username']
+
     try:
         mydb = mysql.connector.connect(
             host="localhost",
@@ -86,17 +110,18 @@ def returnExpense():
             password="dheerizz",
             database='Finance Tracker'
         )
+
         user = mydb.cursor()
         user.execute(f"SELECT * FROM expenses where username='{username}'")
-        user=user.fetchall()
+        user = user.fetchall()
         print(user)
-        return jsonify({"expenses": user})
-    except KeyError:
-        print(KeyError)
-    except RuntimeError:
-        print(RuntimeError)
-        return jsonify({"success":False,"error":"An error occurred while trying to add the new user."})
+        response = jsonify({"success": True, "expense":user})
+        response.headers.add('Access-Control-Allow-Origin', '*')  # Allow requests from any origin
+        return response    
+    except Exception as e:
+        print(e)
+        return jsonify({"success": False, "error": "An error occurred while trying to retrieve the expenses."})
 
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0')
 
-if __name__=='__main__':
-    app.run(debug=True)

@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {Link, useNavigate} from 'react-router-dom'
+import userContext from "../Context/Context";
 const Login = () => {
+  const context=useContext(userContext)
+  const {user, setUser}= context
   let navigate=useNavigate()
   const [formData, setFormData]=useState({
     email:"",
@@ -10,17 +13,41 @@ const Login = () => {
     setFormData({...formData,[event.target.name]: event.target.value})
     console.log(formData)
 }
-const handleSubmit=(e)=>{
-  e.preventDefault()
-  const email=formData.email
-  const password=formData.password
-  if(email=='admin' && password=='admin'){
-    navigate('/home')
-  }
-}
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const form = {
+    email: formData.email,
+    password: formData.password
+  };
+
+  const requestOptions = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json' 
+    },
+    body: JSON.stringify(form)
+  };
+
+  try {
+    const response = await fetch('http://127.0.0.1:5000/api/login', requestOptions);
+    const data=await response.json();
+    console.log(data)
+    if (!data.success) {
+      throw new Error('Network response was not ok');
+    }
+    else{
+      setUser(data.user)
+      console.log(user)
+      navigate('/')
+    }
+  } catch (error) {
+    console.error('There was a problem with the fetch operation:', error);
+    }
+  };
   return (
     <div
-      className="min-h-screen flex justify-center py-12 px-4 sm:px-6 lg:px-8 items-center"
+      className="min-h-screen flex justify-center py-12  sm:px-6 lg:px-8 items-center  bg-gray-500"
     >
       <div className="absolute bg-black opacity-60 inset-0 z-0"></div>
       <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-xl z-10">
@@ -85,12 +112,7 @@ const handleSubmit=(e)=>{
           </div>
           <p className="flex flex-col items-center justify-center mt-10 text-center text-md text-gray-500">
             <span>Don't have an account?</span>
-            <a
-              href="#"
-              className="text-indigo-500 hover:text-indigo-500no-underline hover:underline cursor-pointer transition ease-in duration-300"
-            >
-              Sign up
-            </a>
+              <Link to='/signup'>Sign Up</Link>
           </p>
         </form>
       </div>
