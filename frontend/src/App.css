@@ -36,3 +36,22 @@
     transform: rotate(360deg);
   }
 }
+/* Define gradient text effect */
+.text-gradient {
+  position: relative;
+  display: inline-block;
+  background: linear-gradient(to right, white, rgb(114, 13, 245)); /* Adjusted gradient colors */
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Create a pseudo-element to add shadow */
+.text-gradient::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: -1;
+  color: #ffffff; /* Fallback color */
+}

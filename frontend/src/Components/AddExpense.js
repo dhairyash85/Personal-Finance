@@ -5,7 +5,16 @@ import userContext from "../Context/Context";
 const Signup = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
-  const options = ["Food", "Travel", "Rent", "Investment", "Clothes", "Fun", "Health", "Misc"];
+  const options = [
+    "Food",
+    "Travel",
+    "Rent",
+    "Investment",
+    "Clothes",
+    "Fun",
+    "Health",
+    "Misc",
+  ];
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -13,7 +22,7 @@ const Signup = () => {
 
   const handleSelect = (option) => {
     setSelectedOption(option);
-    setIsOpen(false); 
+    setIsOpen(false);
   };
   const context = useContext(userContext);
   const { user } = context;
@@ -27,9 +36,9 @@ const Signup = () => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedOption || formData.amount==0){
-        alert("Please enter all values")
-        return
+    if (!selectedOption || formData.amount == 0) {
+      alert("Please enter all values");
+      return;
     }
     const form = {
       username: user[0],
@@ -61,14 +70,14 @@ const Signup = () => {
     }
   };
   return (
-    <div className="min-h-screen flex justify-center py-12  sm:px-6 lg:px-8 items-center  bg-gray-500">
-      <div className="w-max space-y-8 p-10 bg-white rounded-xl z-10">
+    <div className="min-h-screen flex justify-center  sm:px-6 lg:px-8  ">
+      <div className="w-max  p-10 bg-white rounded-xl z-10 h-max">
         <div className="text-center">
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Welcom Back!
+            Add Expenses
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Please sign in to your account
+            Please provide all the details
           </p>
         </div>
 

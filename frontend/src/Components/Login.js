@@ -1,56 +1,52 @@
 import React, { useContext, useState } from "react";
-import {Link, useNavigate} from 'react-router-dom'
+import { Link, useNavigate } from "react-router-dom";
 import userContext from "../Context/Context";
 const Login = () => {
-  const context=useContext(userContext)
-  const {user, setUser}= context
-  let navigate=useNavigate()
-  const [formData, setFormData]=useState({
-    email:"",
-    password:""
-  })
-  const handleChange=(event)=>{
-    setFormData({...formData,[event.target.name]: event.target.value})
-    console.log(formData)
-}
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  const form = {
-    email: formData.email,
-    password: formData.password
+  const context = useContext(userContext);
+  const { user, setUser } = context;
+  let navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const handleChange = (event) => {
+    setFormData({ ...formData, [event.target.name]: event.target.value });
   };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const requestOptions = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json' 
-    },
-    body: JSON.stringify(form)
+    const form = {
+      email: formData.email,
+      password: formData.password,
+    };
+
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(form),
+    };
+
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:5000/api/login",
+        requestOptions
+      );
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error("Network response was not ok");
+      } else {
+        setUser(data.user);
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("There was a problem with the fetch operation:", error);
+    }
   };
-
-  try {
-    const response = await fetch('http://127.0.0.1:5000/api/login', requestOptions);
-    const data=await response.json();
-    console.log(data)
-    if (!data.success) {
-      throw new Error('Network response was not ok');
-    }
-    else{
-      setUser(data.user)
-      console.log(user)
-      navigate('/')
-    }
-  } catch (error) {
-    console.error('There was a problem with the fetch operation:', error);
-    }
-  };
   return (
-    <div
-      className="min-h-screen flex justify-center py-12  sm:px-6 lg:px-8 items-center  bg-gray-500"
-    >
-      <div className="absolute bg-black opacity-60 inset-0 z-0"></div>
-      <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-xl z-10">
+    <div className="min-h-screen flex justify-center   sm:px-6 lg:px-8  ">
+      <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-xl z-10 h-max">
         <div className="text-center">
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
             Welcom Back!
@@ -59,11 +55,10 @@ const handleSubmit = async (e) => {
             Please sign in to your account
           </p>
         </div>
-        
+
         <form className="mt-8 space-y-6" action="#" method="POST">
           <input type="hidden" name="remember" value="true" />
           <div className="relative">
-            
             <label className="text-sm font-bold text-gray-700 tracking-wide">
               Email
             </label>
@@ -105,14 +100,13 @@ const handleSubmit = async (e) => {
               className="w-full flex justify-center bg-indigo-500 text-gray-100 p-4  rounded-full tracking-wide
                                 font-semibold  focus:outline-none focus:shadow-outline hover:bg-indigo-600 shadow-lg cursor-pointer transition ease-in duration-300"
               onClick={handleSubmit}
-              
             >
               Sign in
             </button>
           </div>
           <p className="flex flex-col items-center justify-center mt-10 text-center text-md text-gray-500">
             <span>Don't have an account?</span>
-              <Link to='/signup'>Sign Up</Link>
+            <Link to="/signup">Sign Up</Link>
           </p>
         </form>
       </div>
