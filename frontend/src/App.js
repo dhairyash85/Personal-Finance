@@ -10,8 +10,8 @@ import {
 import Signup from "./Components/Signup";
 import Navbar from "./Components/Navbar";
 import userContext from "./Context/Context";
-import AddExpense from "./Components/AddExpense";
 import { useState } from "react";
+import Stats from "./Components/Stats";
 function App() {
   const [user, setUser] = useState([]);
   return (
@@ -29,7 +29,7 @@ function App() {
             <Route exact path="/" element={<Home />}></Route>
             <Route exact path="/login" element={<Login />}></Route>
             <Route exact path="/signup" element={<Signup />}></Route>
-            <Route exact path="/addexpense" element={<AddExpense />}></Route>
+            <Route exact path="/stats" element={<Stats />}></Route>
           </Routes>
         </div>
       </Router>

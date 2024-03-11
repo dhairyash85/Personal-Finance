@@ -70,7 +70,7 @@ const Signup = () => {
     }
   };
   return (
-    <div className="min-h-screen flex justify-center  sm:px-6 lg:px-8  ">
+    <div className="min-h-screen flex justify-center py-5 sm:px-6 lg:px-20  ">
       <div className="w-max  p-10 bg-white rounded-xl z-10 h-max">
         <div className="text-center">
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
@@ -81,10 +81,12 @@ const Signup = () => {
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" action="#" method="POST">
-          <div className="relative">
+        <form className="mt-8 space-y-6 flex items-center " method="POST">
+          <div className="mr-10">
+
+          <div className="relative px-5 py-2">
             <label className="text-sm font-bold text-gray-700 tracking-wide">
-              Amonut
+              Amonut:{"\t\t\t"}    
             </label>
             <input
               className=" w-full text-base py-2 border-b border-gray-300 focus:outline-none focus:border-indigo-500"
@@ -93,9 +95,9 @@ const Signup = () => {
               placeholder="mail@gmail.com"
               value={formData.amount}
               onChange={handleChange}
-            />
+              />
           </div>
-          <div className="relative">
+          <div className="relative px-5">
             <label className="text-sm font-bold text-gray-700 tracking-wide">
               Type
             </label>
@@ -103,7 +105,7 @@ const Signup = () => {
               type="button"
               onClick={toggleDropdown}
               className="block w-full px-4 py-2 text-left border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-blue-500"
-            >
+              >
               {selectedOption || "Select an option"}
               <svg
                 className={`absolute inset-y-0 right-0 w-5 h-5 mt-1 mr-2 text-gray-600 pointer-events-none ${
@@ -111,27 +113,28 @@ const Signup = () => {
                 }`}
                 fill="currentColor"
                 viewBox="0 0 20 20"
-              >
+                >
                 <path
                   fillRule="evenodd"
                   d="M6.293 7.293a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L10 10.414l-2.293 2.293a1 1 0 01-1.414-1.414l3-3z"
                   clipRule="evenodd"
-                />
+                  />
               </svg>
             </button>
             {isOpen && (
               <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
                 {options.map((option, index) => (
                   <div
-                    key={index}
-                    className="px-4 py-2 cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSelect(option)}
+                  key={index}
+                  className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleSelect(option)}
                   >
                     {option}
                   </div>
                 ))}
               </div>
             )}
+            </div>
           </div>
 
           <div>
