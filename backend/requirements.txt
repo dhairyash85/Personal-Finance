@@ -1,0 +1,6 @@
+Flask
+mysql-connector-python
+flask-cors
+matplotlib
+scikit-learn
+joblib
