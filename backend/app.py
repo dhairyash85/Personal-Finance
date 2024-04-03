@@ -20,6 +20,7 @@ app = Flask(__name__,
 CORS(app, support_credentials=True)
 models=[]
 def train_models_route():
+    models.clear()
     data = load_data()
     X = data[['income', 'age']]
     y = data.drop(columns=['income', 'username', 'age'])
@@ -94,7 +95,7 @@ def login():
     else:
         
         response = jsonify({"success": True, "user":user})
-        # response.headers.add('Access-Control-Allow-Origin', '*')  
+        response.headers.add('Access-Control-Allow-Origin', '*')  
         return response
 
 @app.route('/api/signup', methods=['POST'])
@@ -124,26 +125,26 @@ def signup():
         return jsonify({"success": False, "error": "An error occurred while trying to add the new user."})
 
 
-
+@app.route('/api/addexpense', methods=['POST'])
 def addExpense():
     # Parse request data
     data = request.get_json()
     amount = data['amount']
     expense_type = data['type']
-    username = data['username']  # Assuming username is provided in the request
-
-    # Retrieve training data for the expense type
-    # X_train, y_train = get_training_data(expense_type)
-
-    # Update the existing row corresponding to the user
-    # user_index = X_train.index[X_train['username'] == username].tolist()[0]  # Find the index of the user
-    # y_train.loc[user_index] += amount  # Update the total expense amount for the user
-
+    username = data['username'] 
+    current_date = date.today() # Assuming username is provided in the request
     try:
-        # Update and train model for the corresponding expense type
-        # update_model(X_train, y_train, expense_type)
+        mydb = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="dheerizz",
+            database='Finance Tracker'
+        )
 
-        # Return response
+        user = mydb.cursor()
+        user.execute(f"INSERT INTO expenses VALUE('{username}', '{expense_type}', '{current_date}', {amount})")
+        mydb.commit()
+        train_models_route()
         response = jsonify({"success": True})
         response.headers.add('Access-Control-Allow-Origin', '*')  
         return response    
@@ -168,10 +169,8 @@ def returnExpense():
         user.execute(f"SELECT * FROM expenses where username='{username}'")
         user = user.fetchall()
         month=mydb.cursor()
-        # print(f"SELECT expenses.type, SUM(expenses.amount) AS total_amount, users.age, income.salary, income.business, income.sideHustle FROM expenses RIGHT JOIN users ON expenses.username = users.username RIGHT JOIN income ON users.username = income.username WHERE expenses.username = '{username}' AND expenses.day >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH) GROUP BY expenses.type, users.age, income.salary, income.business, income.sideHustle")
         month.execute(f"SELECT expenses.type, SUM(expenses.amount) AS total_amount, users.age, income.salary, income.business, income.sideHustle FROM expenses RIGHT JOIN users ON expenses.username = users.username RIGHT JOIN income ON users.username = income.username WHERE expenses.username = '{username}' AND expenses.day >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH) GROUP BY expenses.type, users.age, income.salary, income.business, income.sideHustle")
         month=month.fetchall()
-        # print(month)
         expense_types = [  "Food",  "Travel",  "Rent",  "Investment",  "Clothes",  "Fun",  "Health",  "Misc",]
         age=month[0][2]
         print(age)

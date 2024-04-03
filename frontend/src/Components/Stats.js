@@ -50,6 +50,7 @@ const onLogin = async () => {
         setExpenses(responseData.expense);
         setMonthExpense(responseData.month);
         setRecommendation(responseData.recommendation)
+        console.log(recommendation)
       });
     } catch (error) {
       console.error("There was a problem with the fetch operation:", error);
@@ -67,9 +68,9 @@ const onLogin = async () => {
   const totalSpent = () => {
     console.log("starting");
     let sum = 0;
-    expenses[3].forEach((expense) => (sum += expense));
+    expenses.forEach((expense) => (sum += +expense[3]));
     console.log(sum);
-    return sum.toString;
+    return sum
   };
   return (
     <div className="min-h-screen">
@@ -92,10 +93,13 @@ const onLogin = async () => {
                   <tr className="border-b border-blue-gray-200">
                     <td className="py-3 px-4">{expense[0]}</td>
                     <td className="py-3 px-4">{expense[1]}</td>
-                    <td className="py-3 px-4">{recommendation[expense[0]]}</td>
+                    <td className="py-3 px-4">{expense[0]=='Travel' || expense[0]=='Health'? "-":recommendation[expense[0]]}</td>
                   </tr>
                 );
               })}
+              <tr className="border-b border-blue-gray-200">
+                    <td className="py-3 px-4">Total Spent: {totalSpent()}</td>
+                  </tr>
             </tbody>
           </table>
         </div>
