@@ -12,11 +12,20 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 from joblib import dump, load  # Import joblib for model persistence
+from model import load_data, train_models
+# print("MODELSS",models)
 app = Flask(__name__,
             static_url_path='/',
             static_folder='build/')
 CORS(app, support_credentials=True)
-models={}
+models=[]
+def train_models_route():
+    data = load_data()
+    X = data[['income', 'age']]
+    y = data.drop(columns=['income', 'username', 'age'])
+    models.append(train_models(X, y))
+train_models_route()
+print("MODES", models[0]['Clothes'])
 def generate_pie_chart(username):
     mydb = mysql.connector.connect(
         host="localhost",
@@ -52,47 +61,8 @@ def generate_pie_chart(username):
 
     return chart_data
 
-def load_models():
-    models = {}
-    expense_types = [  "Food",  "Travel",  "Rent",  "Investment",  "Clothes",  "Fun",  "Health",  "Misc",]  # Replace with your expense types
-    for expense_type in expense_types:
-        try:
-            model = load(f"{expense_type}.pkl")
-        except FileNotFoundError:
-            model = RandomForestRegressor(n_estimators=5)  # Initialize a new model if file not found
-        models[expense_type] = model
-    return models
-
-models = load_models()
 
 # Function to update and save the trained model
-def update_model(X_train, y_train, expense_type):
-    model = RandomForestRegressor(n_estimators=5)
-    model.fit(X_train, y_train)
-    dump(model, f"{expense_type}.pkl")
-
-# Function to retrieve training data from database
-def get_training_data(expense_type):
-    mydb = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="dheerizz",
-        database='Finance Tracker'
-    )
-    mycursor = mydb.cursor()
-    mycursor.execute(f"SELECT SUM(amount) AS amount, type, username FROM expenses WHERE type = '{expense_type}' GROUP BY username")
-    results = mycursor.fetchall()
-    X_train = pd.DataFrame(columns=['income', 'age'])
-    y_train = pd.DataFrame(columns=['amount'])
-    for result in results:
-        username = result[2]
-        mycursor.execute(f"SELECT SUM(salary) AS total_salary, SUM(business) AS total_business, SUM(sideHustle) AS total_side_hustle, age FROM income INNER JOIN users ON income.username = users.username WHERE users.username = '{username}'")
-        income_result = mycursor.fetchone()
-        income = income_result[0] + income_result[1] + income_result[2]
-        age = income_result[3]
-        X_train = X_train.append({'income': income, 'age': age}, ignore_index=True)
-        y_train = y_train.append({'amount': result[0]}, ignore_index=True)
-    return X_train, y_train
 
 # Your Flask routes
 # ...
@@ -124,7 +94,7 @@ def login():
     else:
         
         response = jsonify({"success": True, "user":user})
-        response.headers.add('Access-Control-Allow-Origin', '*')  
+        # response.headers.add('Access-Control-Allow-Origin', '*')  
         return response
 
 @app.route('/api/signup', methods=['POST'])
@@ -163,15 +133,15 @@ def addExpense():
     username = data['username']  # Assuming username is provided in the request
 
     # Retrieve training data for the expense type
-    X_train, y_train = get_training_data(expense_type)
+    # X_train, y_train = get_training_data(expense_type)
 
     # Update the existing row corresponding to the user
-    user_index = X_train.index[X_train['username'] == username].tolist()[0]  # Find the index of the user
-    y_train.loc[user_index] += amount  # Update the total expense amount for the user
+    # user_index = X_train.index[X_train['username'] == username].tolist()[0]  # Find the index of the user
+    # y_train.loc[user_index] += amount  # Update the total expense amount for the user
 
     try:
         # Update and train model for the corresponding expense type
-        update_model(X_train, y_train, expense_type)
+        # update_model(X_train, y_train, expense_type)
 
         # Return response
         response = jsonify({"success": True})
@@ -182,7 +152,6 @@ def addExpense():
     
 
 @app.route('/api/returnexpense', methods=['POST'])
-
 def returnExpense():
     data = request.get_json()
     username = data['username']
@@ -199,14 +168,29 @@ def returnExpense():
         user.execute(f"SELECT * FROM expenses where username='{username}'")
         user = user.fetchall()
         month=mydb.cursor()
-        month.execute(f"SELECT type, SUM(amount) FROM expenses WHERE username = '{username}' AND day >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH) GROUP BY type;")
+        # print(f"SELECT expenses.type, SUM(expenses.amount) AS total_amount, users.age, income.salary, income.business, income.sideHustle FROM expenses RIGHT JOIN users ON expenses.username = users.username RIGHT JOIN income ON users.username = income.username WHERE expenses.username = '{username}' AND expenses.day >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH) GROUP BY expenses.type, users.age, income.salary, income.business, income.sideHustle")
+        month.execute(f"SELECT expenses.type, SUM(expenses.amount) AS total_amount, users.age, income.salary, income.business, income.sideHustle FROM expenses RIGHT JOIN users ON expenses.username = users.username RIGHT JOIN income ON users.username = income.username WHERE expenses.username = '{username}' AND expenses.day >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH) GROUP BY expenses.type, users.age, income.salary, income.business, income.sideHustle")
         month=month.fetchall()
-        print(month)
-        response = jsonify({"success": True, "expense":user, "month": month})
+        # print(month)
+        expense_types = [  "Food",  "Travel",  "Rent",  "Investment",  "Clothes",  "Fun",  "Health",  "Misc",]
+        age=month[0][2]
+        print(age)
+        income=int(month[0][3])+int(month[0][4])+int(month[0][5])
+        print(income)
+        prediction={}
+        for type in expense_types:
+            # print(models[type])
+            print("PREDICTING")
+            prediction[type]=models[0][type].predict([[age,income]])[0]
+            print(prediction[type])
+        print(prediction)
+        response = jsonify({"success": True, "expense":user, "month": month, "recommendation":prediction})
         response.headers.add('Access-Control-Allow-Origin', '*')  
+        # print(response)
         return response    
     except Exception as e:
-        return jsonify({"success": False, "error": "An error occurred while trying to retrieve the expenses."})
+        print("eroor", e)
+        return jsonify({"success": False, "error": e})
 
 @app.route('/api/returnchart', methods=['POST'])
 def returnchart():

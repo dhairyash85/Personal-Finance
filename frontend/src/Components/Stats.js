@@ -5,6 +5,7 @@ const Stats = () => {
   const context = useContext(userContext);
   const [expenses, setExpenses] = useState([[]]);
   const [chartData, setChartData] = useState("");
+  const [recommendation, setRecommendation]=useState()
   const [monthExpense, setMonthExpense]=useState([[]])
 
   const { user } = context;
@@ -22,7 +23,10 @@ const Stats = () => {
       .then((response) => response.json())
       .then((data) => setChartData(data.chartData));
   }, []);
-  const onLogin = async () => {
+  
+  useEffect(() => {
+    if (user) {
+const onLogin = async () => {
     let form;
     if (user) {
       form = {
@@ -38,24 +42,19 @@ const Stats = () => {
     };
 
     try {
-      const response = await fetch(
+      fetch(
         "http://127.0.0.1:5000/api/returnexpense",
         requestOptions
-      );
-      const responseData = await response.json();
-      console.log(responseData)
-      if (!responseData.success) {
-        throw new Error("Network response was not ok");
-      } else {
+      ).then((response) => response.json())
+      .then((responseData) => {
         setExpenses(responseData.expense);
-        setMonthExpense(responseData.month)
-      }
+        setMonthExpense(responseData.month);
+        setRecommendation(responseData.recommendation)
+      });
     } catch (error) {
       console.error("There was a problem with the fetch operation:", error);
     }
   };
-  useEffect(() => {
-    if (user) {
       onLogin();
     }
   }, [user]);
@@ -84,6 +83,7 @@ const Stats = () => {
               <tr className="bg-blue-gray-100 text-gray-700">
                 <th className="py-3 px-4 text-left">Type</th>
                 <th className="py-3 px-4 text-left">Amount</th>
+                <th className="py-3 px-4 text-left">Recommendation</th>
               </tr>
             </thead>
             <tbody className="text-blue-gray-900">
@@ -92,6 +92,7 @@ const Stats = () => {
                   <tr className="border-b border-blue-gray-200">
                     <td className="py-3 px-4">{expense[0]}</td>
                     <td className="py-3 px-4">{expense[1]}</td>
+                    <td className="py-3 px-4">{recommendation[expense[0]]}</td>
                   </tr>
                 );
               })}
