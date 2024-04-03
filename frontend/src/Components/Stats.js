@@ -68,13 +68,15 @@ const onLogin = async () => {
   const totalSpent = () => {
     console.log("starting");
     let sum = 0;
-    expenses.forEach((expense) => (sum += +expense[3]));
+    expenses.forEach((expense) => (sum += expense[1]));
     console.log(sum);
-    return sum
+    return sum.toString;
   };
   return (
+    
     <div className="min-h-screen">
-      <div className="flex justify-around">
+      {recommendation && (
+        <div className="flex justify-around">
         <div>
           <img className="rounded-xl" src={`data:image/png;base64,${chartData}`} alt="Pie Chart" />
         </div>
@@ -97,9 +99,6 @@ const onLogin = async () => {
                   </tr>
                 );
               })}
-              <tr className="border-b border-blue-gray-200">
-                    <td className="py-3 px-4">Total Spent: {totalSpent()}</td>
-                  </tr>
             </tbody>
           </table>
         </div>
@@ -129,6 +128,8 @@ const onLogin = async () => {
         </div>
        
       </div>
+      )}
+      
     </div>
   );
 };
