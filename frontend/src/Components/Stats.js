@@ -98,7 +98,7 @@ const onLogin = async () => {
                   <tr className="border-b border-blue-gray-200">
                     <td className="py-3 px-4">{expense[0]}</td>
                     <td className="py-3 px-4">{expense[1]}</td>
-                    <td className="py-3 px-4">{monthBudget[expense[0]]?monthBudget[expense[0]]:"  "}</td>
+                    <td className="py-3 px-4">{monthBudget[expense[0]]?monthBudget[expense[0]]:"-"}</td>
                     <td className="py-3 px-4">{expense[0]=='Travel' || expense[0]=='Health'? "-":recommendation[expense[0]]}</td>
                   </tr>
                 );

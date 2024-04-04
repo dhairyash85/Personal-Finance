@@ -63,9 +63,6 @@ const Income = () => {
               <h2 className="mt-6 text-3xl font-bold text-gray-900">
                 Add your income
               </h2>
-              <p className="mt-2 text-sm text-gray-600">
-                Please sign in to your account
-              </p>
             </div>
             <input type="hidden" name="remember" value="true" />
             <div className="relative">
@@ -120,12 +117,14 @@ const Income = () => {
           </form>
         </div>
       </div>
+      <div className="flex justify-center mt-5">
+
       <button
         className="flex text-white justify-center items-center w-max min-w-max sm:w-max px-6 h-12 rounded-full outline-none relative overflow-hidden border duration-300 ease-linear
         after:absolute after:inset-x-0 after:aspect-square after:scale-0 after:opacity-70 after:origin-center after:duration-300 after:ease-linear after:rounded-full after:top-0 after:left-0 after:bg-[#21492e] hover:after:opacity-100 hover:after:scale-[2.5] bg-green-400 border-transparent hover:border-[#21492e]"
         onClick={handleClick}
-      >
-        <span className="hidden sm:flex relative ">Add Expenses</span>
+        >
+        <span className="hidden sm:flex relative ">Add Budget</span>
         <span className="flex sm:hidden relative ">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -134,15 +133,16 @@ const Income = () => {
             strokeWidth="1.5"
             stroke="currentColor"
             className="w-5 h-5"
-          >
+            >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
               d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
-            />
+              />
           </svg>
         </span>
       </button>
+              </div>
     </div>
   );
 };

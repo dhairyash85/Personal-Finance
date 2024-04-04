@@ -75,7 +75,7 @@ const Signup = () => {
       <div id="form" className="w-max p-10 bg-white rounded-xl opacity-100  h-max">
         <div className="text-center">
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Add Expenses
+            Add Budget
           </h2>
           <p className="mt-2 text-sm text-gray-600">
             Please provide all the details
@@ -144,7 +144,7 @@ const Signup = () => {
                                   font-semibold  focus:outline-none focus:shadow-outline hover:bg-green-600 shadow-lg cursor-pointer transition ease-in duration-300"
               onClick={handleSubmit}
             >
-              Add Expense
+              Submit
             </button>
             <button
               type="button"
