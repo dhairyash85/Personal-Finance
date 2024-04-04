@@ -9,7 +9,7 @@ def load_data():
     mydb = mysql.connector.connect(
         host="localhost",
         user="root",
-        password="dheerizz",
+        password="123456",
         database='Finance Tracker'
     )
     mycursor = mydb.cursor()
