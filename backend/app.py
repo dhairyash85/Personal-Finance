@@ -26,12 +26,12 @@ def train_models_route():
     y = data.drop(columns=['income', 'username', 'age'])
     models.append(train_models(X, y))
 train_models_route()
-print("MODES", models[0]['Clothes'])
+# print("MODES", models[0]['Clothes'])
 def generate_pie_chart(username):
     mydb = mysql.connector.connect(
         host="localhost",
         user="root",
-        password="dheerizz",
+        password="123456",
         database='Finance Tracker'
     )
     mycursor = mydb.cursor()
@@ -81,7 +81,7 @@ def login():
     mydb = mysql.connector.connect(
         host="localhost",
         user="root",
-        password="dheerizz",
+        password="123456",
         database='Finance Tracker'
     )
 
@@ -112,7 +112,7 @@ def signup():
         mydb = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="dheerizz",
+            password="123456",
             database='Finance Tracker'
         )
 
@@ -138,7 +138,7 @@ def addincome():
         mydb = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="dheerizz",
+            password="123456",
             database='Finance Tracker'
         )
 
@@ -170,7 +170,7 @@ def addExpense():
         mydb = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="dheerizz",
+            password="123456",
             database='Finance Tracker'
         )
 
@@ -195,7 +195,7 @@ def addBudget():
         mydb = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="dheerizz",
+            password="123456",
             database='Finance Tracker'
         )
 
@@ -224,7 +224,7 @@ def returnExpense():
         mydb = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="dheerizz",
+            password="123456",
             database='Finance Tracker'
         )
 
