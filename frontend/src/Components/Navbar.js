@@ -12,12 +12,12 @@ const Navbar = () => {
       <nav className="mb-10 h-max py-5 px-12">
         <div className="w-full mx-auto">
           <div className="mx-2 flex flex-wrap items-center justify-between">
-            <a href="#" className="flex items-center">
+            <Link to="/" className="flex items-center">
               {/* <img src={logo} classname='h-2 w-2   max-h-0.5 max-w-0.5'></img> */}
               <h1 className="text-gradient text-5xl font-bold">
               BudgetBuddy
               </h1>
-            </a>
+            </Link>
             <div className="flex md:hidden md:order-2">
               <button
                 data-collapse-toggle="mobile-menu-3"
@@ -84,13 +84,23 @@ const Navbar = () => {
                   )}
                 </li>
                 {user.length != 0 ? (
-                  <li>
+                  <div className="flex-col md:flex-row flex md:space-x-8 mt-4 md:mt-0 md:text-sm md:font-medium">
+                    <li>
                     <Link to="/stats">
                       <div className="text-white text-xl hover:bg-gray-50 border-b border-gray-100 md:hover:bg-transparent md:border-0 block pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0">
                         Statistics
                       </div>
                     </Link>
                   </li>
+                  <li>
+                    <Link to="/income">
+                      <div className="text-white text-xl hover:bg-gray-50 border-b border-gray-100 md:hover:bg-transparent md:border-0 block pl-3 pr-4 py-2 md:hover:text-blue-700 md:p-0">
+                        Income
+                      </div>
+                    </Link>
+                  </li>
+                  </div>
+                  
                 ) : (
                   <li>
                     <Link to="/signup">

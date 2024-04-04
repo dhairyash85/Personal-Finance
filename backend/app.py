@@ -119,11 +119,44 @@ def signup():
         user = mydb.cursor()
         user.execute(f"INSERT INTO users(email, fname, lname, username, age, password) VALUE('{email}', '{fname}', '{lname}', '{username}', {age}, '{password}')")
         mydb.commit()
-
+        user.execute(f"INSERT INTO income VALUE('{username}', 0, 0, 0)")
+        mydb.commit()
+        
         return jsonify({"success": True})
     except Exception as e:
         return jsonify({"success": False, "error": "An error occurred while trying to add the new user."})
 
+@app.route('/api/addincome', methods=['POST'])
+def addincome():
+    data = request.get_json()
+    salary = data["salary"]
+    business = data['business']
+    sideHustle = data['sideHustle']
+    username = data['username']
+    print(sideHustle)
+    try:
+        mydb = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="dheerizz",
+            database='Finance Tracker'
+        )
+
+        user = mydb.cursor()
+        user.execute(f"SELECT * FROM income WHERE username='{username}'")
+        if not user.fetchall():
+            user.execute(f"INSERT INTO income(username, salary, business, sideHustle) VALUES('{username}', {salary}, {business}, {sideHustle})")
+        else:
+            print(f"UPDATE income set salary={salary}, business={business}, sideHustle={sideHustle} where username={username}")
+            user.execute(f"UPDATE income set salary={salary}, business={business}, sideHustle={sideHustle} where username='{username}'")
+        # user.execute(f"INSERT INTO income(username, salary, business, sideHustle) VALUES('{username}', {salary}, {business}, {sideHustle}) on duplicate key update salary={salary}, business={business}, sideHustle={sideHustle}")
+        print(f"INSERT INTO income(username, salary, business, sideHustle) VALUES('{username}', {salary}, {business}, {sideHustle}) on duplicate key update salary=VALUES({salary}), business=VALUES({business}), sideHustle=VALUES({sideHustle})")
+        mydb.commit()
+
+        return jsonify({"success": True})
+    except Exception as e:
+        print(e)
+        return jsonify({"success": False, "error": "An error occurred while trying to add the new user."})
 
 @app.route('/api/addexpense', methods=['POST'])
 def addExpense():
@@ -151,8 +184,38 @@ def addExpense():
     except Exception as e:
         return jsonify({"success": False, "error": "An error occurred while trying to add the new expense."})
     
+@app.route('/api/addbudget', methods=['POST'])
+def addBudget():
+    # Parse request data
+    data = request.get_json()
+    amount = data['amount']
+    expense_type = data['type']
+    username = data['username'] 
+    try:
+        mydb = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="dheerizz",
+            database='Finance Tracker'
+        )
+
+        user = mydb.cursor()
+        user.execute(f"SELECT * FROM monthlyBudget WHERE username='{username}'  AND type='{expense_type}'")
+        
+        if (user.fetchone()) is None:
+            user.execute(f"INSERT INTO monthlyBudget VALUE('{username}', {amount}, '{expense_type}')")
+        else:
+            user.execute(f"UPDATE monthlyBudget set budget = {amount} where username='{username}' AND type='{expense_type}'")
+        mydb.commit()
+        response = jsonify({"success": True})
+        response.headers.add('Access-Control-Allow-Origin', '*')  
+        return response    
+    except Exception as e:
+        print(e)
+        return jsonify({"success": False, "error": "An error occurred while trying to add the new expense."})
 
 @app.route('/api/returnexpense', methods=['POST'])
+# @cross_origin()
 def returnExpense():
     data = request.get_json()
     username = data['username']
@@ -183,9 +246,19 @@ def returnExpense():
             prediction[type]=models[0][type].predict([[age,income]])[0]
             print(prediction[type])
         print(prediction)
-        response = jsonify({"success": True, "expense":user, "month": month, "recommendation":prediction})
-        response.headers.add('Access-Control-Allow-Origin', '*')  
-        # print(response)
+        budget=mydb.cursor()
+        budget.execute(f"SELECT * FROM monthlyBudget WHERE username='{username}'")
+        t=budget.fetchall()
+        budget={}
+        for i in t:
+            budget[i[2]]=i[1]
+        print(budget)
+        response = jsonify({"success": True, "expense":user, "month": month, "recommendation":prediction, "budget":budget})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Expose-Headers', 'Content-Type,Content-Length,Authorization,X-Pagination')
+        print(response)
         return response    
     except Exception as e:
         print("eroor", e)
@@ -203,5 +276,5 @@ def returnchart():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0', port=5000)
 

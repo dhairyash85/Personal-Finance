@@ -12,6 +12,7 @@ import Navbar from "./Components/Navbar";
 import userContext from "./Context/Context";
 import { useState } from "react";
 import Stats from "./Components/Stats";
+import Income from "./Components/Income";
 function App() {
   const [user, setUser] = useState([]);
   const [showForm, setShowForm]=useState(false)
@@ -31,6 +32,7 @@ function App() {
             <Route exact path="/login" element={<Login />}></Route>
             <Route exact path="/signup" element={<Signup />}></Route>
             <Route exact path="/stats" element={<Stats />}></Route>
+            <Route exact path="/income" element={<Income />}></Route>
           </Routes>
         </div>
       </Router>
