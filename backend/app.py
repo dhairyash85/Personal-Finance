@@ -5,6 +5,7 @@ import matplotlib
 matplotlib.use('Agg') 
 import matplotlib.pyplot as plt
 from datetime import date
+import plotly.express as px
 import io
 import base64
 import pandas as pd
@@ -13,6 +14,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 from joblib import dump, load  # Import joblib for model persistence
 from model import load_data, train_models
+
 # print("MODELSS",models)
 app = Flask(__name__,
             static_url_path='/',
@@ -26,17 +28,17 @@ def train_models_route():
     y = data.drop(columns=['income', 'username', 'age'])
     models.append(train_models(X, y))
 train_models_route()
-# print("MODES", models[0]['Clothes'])
-def generate_pie_chart(username):
+print("MODES", models[0]['Clothes'])
+def generate_pie_chart(username, interval):
     mydb = mysql.connector.connect(
         host="localhost",
         user="root",
-        password="123456",
+        password="dheerizz",
         database='Finance Tracker'
     )
     mycursor = mydb.cursor()
 
-    sql = "SELECT type, SUM(amount) FROM expenses WHERE username = %s GROUP BY type"
+    sql = f"SELECT type, SUM(amount) FROM expenses WHERE username = %s AND day >= DATE_SUB(CURDATE(), INTERVAL {interval} MONTH) GROUP BY type"
     mycursor.execute(sql, (username,))
     transactions = mycursor.fetchall()
 
@@ -62,7 +64,6 @@ def generate_pie_chart(username):
 
     return chart_data
 
-
 # Function to update and save the trained model
 
 # Your Flask routes
@@ -81,7 +82,7 @@ def login():
     mydb = mysql.connector.connect(
         host="localhost",
         user="root",
-        password="123456",
+        password="dheerizz",
         database='Finance Tracker'
     )
 
@@ -112,7 +113,7 @@ def signup():
         mydb = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="123456",
+            password="dheerizz",
             database='Finance Tracker'
         )
 
@@ -138,7 +139,7 @@ def addincome():
         mydb = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="123456",
+            password="dheerizz",
             database='Finance Tracker'
         )
 
@@ -170,7 +171,7 @@ def addExpense():
         mydb = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="123456",
+            password="dheerizz",
             database='Finance Tracker'
         )
 
@@ -195,7 +196,7 @@ def addBudget():
         mydb = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="123456",
+            password="dheerizz",
             database='Finance Tracker'
         )
 
@@ -219,22 +220,24 @@ def addBudget():
 def returnExpense():
     data = request.get_json()
     username = data['username']
-
+    interval=data["interval"]
     try:
         mydb = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="123456",
+            password="dheerizz",
             database='Finance Tracker'
         )
 
         user = mydb.cursor()
-        user.execute(f"SELECT * FROM expenses where username='{username}'")
+        user.execute(f"SELECT * FROM expenses where username='{username}' AND day >= DATE_SUB(CURDATE(), INTERVAL {interval} MONTH)")
         user = user.fetchall()
         month=mydb.cursor()
-        month.execute(f"SELECT expenses.type, SUM(expenses.amount) AS total_amount, users.age, income.salary, income.business, income.sideHustle FROM expenses RIGHT JOIN users ON expenses.username = users.username RIGHT JOIN income ON users.username = income.username WHERE expenses.username = '{username}' AND expenses.day >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH) GROUP BY expenses.type, users.age, income.salary, income.business, income.sideHustle")
+
+        print(f"SELECT expenses.type, SUM(expenses.amount) AS total_amount, users.age, income.salary, income.business, income.sideHustle FROM expenses RIGHT JOIN users ON expenses.username = users.username RIGHT JOIN income ON users.username = income.username WHERE expenses.username = '{username}' AND expenses.day >= DATE_SUB(CURDATE(), INTERVAL {interval} MONTH) GROUP BY expenses.type, users.age, income.salary, income.business, income.sideHustle")
+        month.execute(f"SELECT expenses.type, SUM(expenses.amount) AS total_amount, users.age, income.salary, income.business, income.sideHustle FROM expenses RIGHT JOIN users ON expenses.username = users.username RIGHT JOIN income ON users.username = income.username WHERE expenses.username = '{username}' AND expenses.day >= DATE_SUB(CURDATE(), INTERVAL {interval} MONTH) GROUP BY expenses.type, users.age, income.salary, income.business, income.sideHustle")
         month=month.fetchall()
-        expense_types = [  "Food",  "Travel",  "Rent",  "Investment",  "Clothes",  "Fun",  "Health",  "Misc",]
+        expense_types = [  "Food", "Rent",  "Investment"]
         age=month[0][2]
         print(age)
         income=int(month[0][3])+int(month[0][4])+int(month[0][5])
@@ -268,8 +271,10 @@ def returnExpense():
 def returnchart():
     data = request.get_json()
     username = data['username']
+    interval = data['interval']
+    
     print(username)
-    chart_data = generate_pie_chart(username    )
+    chart_data = generate_pie_chart(username, interval    )
     response=jsonify({'chartData': chart_data})
     response.headers.add('Access-Control-Allow-Origin', '*')  
     return response

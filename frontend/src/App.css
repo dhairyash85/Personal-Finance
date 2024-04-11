@@ -55,3 +55,27 @@
   z-index: -1;
   color: #ffffff; /* Fallback color */
 }
+
+/* For WebKit-based browsers (Chrome, Safari) */
+::-webkit-scrollbar {
+  width: 5px; /* Adjust the width as needed */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #4f4f4f; /* Adjust the color as needed */
+  border-radius: 5px; /* Adjust the radius to make it round */
+}
+
+::-webkit-scrollbar-track {
+  background-color: #f1f1f1; /* Adjust the color as needed */
+}
+
+/* For Firefox */
+/* This will style the scrollbar but Firefox does not support changing its width */
+/* You can only change the color in Firefox */
+/* You may need to use a JavaScript library like 'simplebar' for better scrollbar customization in Firefox */
+/* Alternatively, you can leave this section empty if Firefox compatibility is not a concern */
+.scrollbar {
+  scrollbar-width: thin; /* Adjust the width as needed */
+  scrollbar-color: #4f4f4f #f1f1f1; /* Adjust the colors as needed */
+}
